@@ -26,6 +26,7 @@ docker run --rm \
   -e CMD="$CMD" -e OUT="$OUT" \
   -e WIDTH="${WIDTH:-1280}" -e HEIGHT="${HEIGHT:-720}" -e DURATION="${DURATION:-15}" \
   -e FPS="${FPS:-30}" -e FONTSIZE="${FONTSIZE:-16}" -e GUI="${GUI:-0}" \
+  -e FONT="${FONT:-DejaVu Sans Mono}" -e BG="${BG:-black}" -e FG="${FG:-white}" \
   -e START_DELAY="${START_DELAY:-1.0}" -e END_HOLD="${END_HOLD:-1.5}" \
   -e VNC="${VNC:-0}" ${VNC:+-p "${VNC_PORT:-5900}:${VNC_PORT:-5900}"} \
   "$IMG"

@@ -1,0 +1,8 @@
+{
+  "key": "fast",
+  "label": "fast-path",
+  "device": "CPU",
+  "proc_s": 0.42,
+  "rtfx": 56,
+  "text": "the recorder spins up a virtual display, runs your command inside it, and captures every frame to an mp4. no real screen attached and nothing to click. point it at a terminal program or a windowed app and it just records, headlessly, in a container."
+}

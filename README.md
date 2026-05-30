@@ -10,6 +10,11 @@ window) → `xterm` (for terminal programs) → `ffmpeg x11grab` (capture) →
 `out.mp4`, with optional `x11vnc` for a live preview. What you record is up to
 you — mount your code, pass a command.
 
+A clip this rig produced, the [`duel`](examples/duel) example (two engines
+racing side by side at their real measured speed, with a branding outro):
+
+![a two-engine duel clip recorded with this rig](examples/duel/sample.gif)
+
 ## Use it
 
 ```sh
@@ -63,4 +68,9 @@ runtimes, `pip install`/`apt-get` inside `CMD` or extend the Dockerfile.
 - A real consumer of this rig: the parakeet.cpp "transcription race" demo —
   it just provides a `rich` renderer + data and calls this recorder.
 
-`examples/hello/` is a trivial TUI to smoke-test the rig.
+## Examples
+
+- [`examples/hello/`](examples/hello) — a trivial progress-bar TUI to smoke-test the rig.
+- [`examples/duel/`](examples/duel) — a full "processing race" comparison video:
+  two engines side by side, progress bars, stats card, and a configurable
+  branding outro (plus an optional subtle CRT pass). Bring your own traces.
