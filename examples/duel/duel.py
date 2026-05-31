@@ -121,16 +121,26 @@ def header(traces, note, dilate, cols):
     return Group(g, Text("─" * cols, style=RULE), Text(""))
 
 
-def view(traces, note, real_elapsed, dilate, cols, rows):
+def view(traces, note, real_elapsed, dilate, cols, rows, layout="cols"):
     avail = rows - 3
-    pane_h = max(10, min(avail, 20))
-    top_pad = max(0, (avail - pane_h) // 2)
-    inner_w = max(20, cols // 2 - 9)
     fastest = min(traces, key=lambda t: t["proc_s"])
-    g = Table.grid(expand=True, padding=(0, 1))
-    g.add_column(ratio=1); g.add_column(ratio=1)
-    g.add_row(*[pane(t, real_elapsed, pane_h, inner_w, i == 0, t is fastest)
-                for i, t in enumerate(traces)])
+    if layout == "rows":     # stacked full-width panes (square / vertical frames)
+        pane_h = max(8, min(avail // 2 - 1, 18))
+        top_pad = max(0, (avail - pane_h * 2 - 1) // 2)
+        inner_w = max(20, cols - 8)
+        g = Table.grid(expand=True)
+        g.add_column(ratio=1)
+        g.add_row(pane(traces[0], real_elapsed, pane_h, inner_w, True, traces[0] is fastest))
+        g.add_row(Text(""))
+        g.add_row(pane(traces[1], real_elapsed, pane_h, inner_w, False, traces[1] is fastest))
+    else:                    # side by side (16:9)
+        pane_h = max(10, min(avail, 20))
+        top_pad = max(0, (avail - pane_h) // 2)
+        inner_w = max(20, cols // 2 - 9)
+        g = Table.grid(expand=True, padding=(0, 1))
+        g.add_column(ratio=1); g.add_column(ratio=1)
+        g.add_row(*[pane(t, real_elapsed, pane_h, inner_w, i == 0, t is fastest)
+                    for i, t in enumerate(traces)])
     return Group(header(traces, note, dilate, cols), Text("\n" * top_pad), g)
 
 
@@ -173,6 +183,8 @@ def main():
     ap.add_argument("--dilate", type=float, default=1.0, help="slow-mo factor (1 = real time)")
     ap.add_argument("--hold", type=float, default=1.0)
     ap.add_argument("--card", type=float, default=3.0)
+    ap.add_argument("--layout", choices=["cols", "rows"], default="cols",
+                    help="cols = side by side (16:9), rows = stacked (square / vertical)")
     a = ap.parse_args()
 
     traces = load(a.traces, a.keys.split(","))
@@ -187,9 +199,9 @@ def main():
     with Live(console=console, refresh_per_second=a.fps, screen=True) as live:
         t0 = time.perf_counter()
         while (w := time.perf_counter() - t0) < wall_end:
-            live.update(view(traces, a.note, w / a.dilate, a.dilate, cols, rows))
+            live.update(view(traces, a.note, w / a.dilate, a.dilate, cols, rows, a.layout))
             time.sleep(dt)
-        live.update(view(traces, a.note, real_end, a.dilate, cols, rows))
+        live.update(view(traces, a.note, real_end, a.dilate, cols, rows, a.layout))
         time.sleep(0.7)
         live.update(Panel(Align.center(end_card(traces, a.note, a.link), vertical="middle"),
                           border_style="black", box=box.SIMPLE, height=rows))

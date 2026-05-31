@@ -17,14 +17,18 @@ ROOT=$(cd "$HERE/../.." && pwd)        # recorder-for-agents root (has record.sh
 OUT=${1:-duel.mp4}
 KEYS=${KEYS:-fast,baseline}; DILATE=${DILATE:-1}; NOTE=${NOTE:-same output}
 LINK=${LINK:-github.com/mudler/recorder-for-agents}
+# layout + frame size: default 16:9 side-by-side; LAYOUT=rows + a square/vertical
+# WIDTHxHEIGHT gives a mobile cut.
+LAYOUT=${LAYOUT:-cols}; W=${WIDTH:-1280}; H=${HEIGHT:-720}
 
 # render + record (tinted dark background via the recorder's BG knob)
 WORK="$HERE" BG="#0d1117" FG="#d7dde5" FONTSIZE="${FONTSIZE:-18}" DURATION="${DURATION:-12}" \
-  "$ROOT/record.sh" "python3 duel.py --traces traces --keys $KEYS --dilate $DILATE --note '$NOTE' --link '$LINK'" "$OUT"
+  WIDTH="$W" HEIGHT="$H" \
+  "$ROOT/record.sh" "python3 duel.py --traces traces --keys $KEYS --dilate $DILATE --layout $LAYOUT --note '$NOTE' --link '$LINK'" "$OUT"
 
-# branding outro (needs ffmpeg on the host); LOGO is optional
+# branding outro (needs ffmpeg on the host); LOGO is optional, OW/OH match the frame
 NOEXT="${OUT%.mp4}"
-"$HERE/outro.sh" "$HERE/out/$OUT" "$HERE/out/${NOEXT}_final.mp4"
+OW="$W" OH="$H" "$HERE/outro.sh" "$HERE/out/$OUT" "$HERE/out/${NOEXT}_final.mp4"
 echo "-> $HERE/out/${NOEXT}_final.mp4"
 
 if [ "${CRT:-0}" = "1" ]; then

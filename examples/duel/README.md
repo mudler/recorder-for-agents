@@ -23,6 +23,19 @@ Knobs (env): `KEYS` (which traces to race), `DILATE` (slow-mo factor, 1 = real
 time), `NOTE` (header/eyebrow text), `LINK` (end-card footer), `DURATION`,
 `FONTSIZE`. `make.sh` calls the recorder for you and runs the outro.
 
+## Layouts (16:9 vs square / vertical)
+
+Default is `cols`: two panes side by side, for a 16:9 clip. Set `LAYOUT=rows`
+with a square or vertical `WIDTH`x`HEIGHT` for a stacked, full-width layout that
+reads better on a phone (the outro scales to match):
+
+```sh
+LAYOUT=rows WIDTH=1080 HEIGHT=1080 FONTSIZE=20 ./make.sh duel_sq.mp4   # square
+LAYOUT=rows WIDTH=1080 HEIGHT=1920 FONTSIZE=22 ./make.sh duel_v.mp4    # vertical
+```
+
+![stacked square layout](sample_square.gif)
+
 ## Bring your own data
 
 Each engine is one JSON file in `traces/`:
