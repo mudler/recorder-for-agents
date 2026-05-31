@@ -60,7 +60,8 @@ Each engine is one JSON file in `traces/`:
 | `duel.py` | the `rich` TUI (panes, progress bars, header, end card) |
 | `outro.sh` | append a branding card: optional `LOGO`, plus `TITLE`/`LINK1`/`LINK2` |
 | `crt.sh` | optional subtle CRT post-process (scanlines, bloom, curvature, vignette) |
-| `make.sh` | render -> record -> outro -> (optional) CRT |
+| `trim_lead.sh` | cut the dead terminal lead-in (empty screen before the first frame) |
+| `make.sh` | render -> record -> trim lead-in -> outro -> (optional) CRT |
 | `traces/` | sample data (`fast` vs `baseline`) |
 
 `outro.sh` and `crt.sh` need `ffmpeg` on the host; `duel.py` needs `rich` (the

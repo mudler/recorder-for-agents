@@ -10,6 +10,7 @@
 #   NOTE      header / eyebrow text   (default: "same output")
 #   LINK      end-card footer link
 #   CRT       1 = also write *_crt.mp4
+#   TRIM      1 = trim the dead terminal lead-in (default on)
 #   DURATION FONTSIZE  passed to the recorder
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -25,6 +26,11 @@ LAYOUT=${LAYOUT:-cols}; W=${WIDTH:-1280}; H=${HEIGHT:-720}
 WORK="$HERE" BG="#0d1117" FG="#d7dde5" FONTSIZE="${FONTSIZE:-18}" DURATION="${DURATION:-12}" \
   WIDTH="$W" HEIGHT="$H" \
   "$ROOT/record.sh" "python3 duel.py --traces traces --keys $KEYS --dilate $DILATE --layout $LAYOUT --note '$NOTE' --link '$LINK'" "$OUT"
+
+# trim the dead terminal lead-in (the empty screen before the TUI's first frame)
+if [ "${TRIM:-1}" = "1" ]; then
+  "$HERE/trim_lead.sh" "$HERE/out/$OUT" "$HERE/out/.trim.mp4" && mv "$HERE/out/.trim.mp4" "$HERE/out/$OUT"
+fi
 
 # branding outro (needs ffmpeg on the host); LOGO is optional, OW/OH match the frame
 NOEXT="${OUT%.mp4}"
