@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Archivo:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3E8D2;--paper2:#ECDFC2;--ink:#211C14;--ink-soft:#5A5142;
+    --rust:#B43A2C;--rust-deep:#8F2C20;--cold:#3F6E73;--hi:#E7D6AE;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1600px;height:900px}
+  body{
+    background:var(--paper);color:var(--ink);font-family:"Archivo",sans-serif;overflow:hidden;
+    background-image:linear-gradient(var(--paper2) 1px,transparent 1px),linear-gradient(90deg,var(--paper2) 1px,transparent 1px);
+    background-size:40px 40px;
+  }
+  .frame{position:absolute;inset:26px;border:3px solid var(--ink)}
+  .wrap{position:absolute;inset:26px;padding:42px 64px 36px;display:flex;flex-direction:column}
+  .eyebrow{font-weight:700;letter-spacing:.22em;text-transform:uppercase;font-size:18px;color:var(--rust-deep)}
+  .eyebrow b{color:var(--ink)}
+  h1{font-family:"Bricolage Grotesque";font-weight:800;font-size:50px;line-height:1;letter-spacing:-.015em;margin-top:8px;max-width:1180px}
+  h1 em{font-style:normal;color:var(--rust)}
+  .legend{display:flex;gap:26px;margin-top:14px;align-items:center}
+  .lg{display:flex;align-items:center;gap:9px;font-weight:700;font-size:18px}
+  .sw{width:22px;height:22px;border:2.5px solid var(--ink)}
+  .sw.hot{background:var(--rust)} .sw.cold{background:var(--cold)}
+  .chartwrap{flex:1;margin-top:10px}
+  svg{width:100%;height:100%;overflow:visible}
+  footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+  .note{font-size:15px;font-weight:600;color:var(--ink-soft);max-width:900px;line-height:1.35}
+  .note b{color:var(--ink)}
+  .url{font-family:"Bricolage Grotesque";font-weight:800;font-size:22px;color:var(--rust-deep)}
+  .url span{color:var(--ink)}
+</style>
+</head>
+<body>
+  <div class="frame"></div>
+  <div class="wrap">
+    <div class="eyebrow">LocalAI <b>·</b> Distributed Mode <b>·</b> warm-cache hit rate</div>
+    <h1>Round-robin forgets your cache as you <em>scale out</em>.</h1>
+    <div class="legend">
+      <div class="lg"><span class="sw hot"></span>LocalAI prefix-cache routing</div>
+      <div class="lg"><span class="sw cold"></span>Round-robin</div>
+    </div>
+    <div class="chartwrap"><svg viewBox="0 0 1460 470" id="chart"></svg></div>
+    <footer>
+      <div class="note">Share of requests that hit a replica already holding their prefix. <b>Simulation driving the shipped router</b> (prefixcache + radix tree): 300 conversations, multi-turn, shared system prompts.</div>
+      <div class="url">localai.io<span>/features/distributed-mode</span></div>
+    </footer>
+  </div>
+<script>
+const INK="#211C14",RUST="#B43A2C",COLD="#3F6E73",HI="#E7D6AE",SOFT="#5A5142",PAPER="#F3E8D2";
+const data=[
+ {n:"2 nodes",hot:87.7,cold:49.3},
+ {n:"4 nodes",hot:72.1,cold:21.7},
+ {n:"8 nodes",hot:81.5,cold:9.2},
+ {n:"16 nodes",hot:89.9,cold:3.6},
+];
+const NS="http://www.w3.org/2000/svg";
+function el(t,a,x){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(x!=null)e.textContent=x;return e;}
+const svg=document.getElementById("chart");
+const X0=70,X1=1440,Y0=20,Y1=400; // plot area; baseline at Y1
+const plotW=X1-X0, plotH=Y1-Y0;
+const val=v=>Y1-(v/100)*plotH;
+// gridlines + y labels
+[0,25,50,75,100].forEach(g=>{
+  const y=val(g);
+  svg.appendChild(el("line",{x1:X0,y1:y,x2:X1,y2:y,stroke:INK,"stroke-width":g===0?3:1,"stroke-dasharray":g===0?"":"2 6","opacity":g===0?1:.5}));
+  svg.appendChild(el("text",{x:X0-16,y:y+5,"text-anchor":"end","font-family":"Archivo","font-weight":700,"font-size":16,fill:SOFT},g+"%"));
+});
+const groupW=plotW/data.length;
+const barW=120, gap=34;
+data.forEach((d,i)=>{
+  const cx=X0+groupW*i+groupW/2;
+  const hx=cx-barW-gap/2, rx=cx+gap/2;
+  // bars (hard offset shadow + fill + outline)
+  [[hx,d.hot,RUST],[rx,d.cold,COLD]].forEach(([x,v,c])=>{
+    const y=val(v),h=Y1-y;
+    svg.appendChild(el("rect",{x:x+6,y:y+6,width:barW,height:h,fill:INK}));
+    svg.appendChild(el("rect",{x,y,width:barW,height:h,fill:c,stroke:INK,"stroke-width":3.5}));
+    svg.appendChild(el("text",{x:x+barW/2,y:y-14,"text-anchor":"middle","font-family":"Bricolage Grotesque","font-weight":800,"font-size":30,fill:INK},v.toFixed(0)+"%"));
+  });
+  // x label
+  svg.appendChild(el("text",{x:cx,y:Y1+40,"text-anchor":"middle","font-family":"Bricolage Grotesque","font-weight":800,"font-size":26,fill:INK},d.n));
+});
+</script>
+</body>
+</html>
