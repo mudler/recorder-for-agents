@@ -115,6 +115,11 @@ The recipe, not the tool, is what matters:
 - [`examples/duel/`](examples/duel) — a full "processing race" comparison video:
   two engines side by side, progress bars, stats card, and a configurable
   branding outro (plus an optional subtle CRT pass). Bring your own traces.
+- [`examples/image_race/`](examples/image_race) — the **image** counterpart: renders
+  frames directly with Pillow (no recorder/Docker) so the content can be real images —
+  two engines labeling the same photo, detection boxes popping in over each one's real
+  time, with a search pill showing the query. Use it when a terminal can't show what you
+  need to show. mp4 + gif, in 16:9 / 1:1 / 9:16.
 - [`examples/cards/`](examples/cards) — two still cards for `render-card.sh`: a
   concept `card.html` (before/after routing diagram) and a `chart.html` (bar
   chart), both in a warm retro-industrial palette. Edit the text/colors and
